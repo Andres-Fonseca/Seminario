@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import norm
 from sklearn.impute import SimpleImputer
+import scipy.stats as stats
+from scipy.stats import shapiro
+from scipy.stats import kstest
 #\
 import warnings
 import inspect
@@ -120,15 +123,34 @@ def tabla__(df,variable):
     #tabla=tabla[tabla['acumulado']<=80]
     return tabla
 
-def histograma(df,bi=50):
-    plt.hist(df, bins=bi, edgecolor='black')  # 'bins' es el número de barras en el histograma
-    plt.xlabel('Valores')
-    plt.ylabel('Frecuencia')
-    plt.title(f'Histograma de ')
 
-    # Mostrar el histograma
-    plt.show()
+def shapiro_test(variable):
+    data = variable
+    stat, p_value = shapiro(data)
+    print(f"Estadístico: {stat}")
+    print(f"P-valor: {p_value}")
+    alpha = 0.05
+    if p_value > alpha:
+        print("Los datos tienen una distribución normal (no se rechaza H0)")
+    else:
+        print("Los datos no tienen una distribución normal (se rechaza H0)")
 
+def kolmogorov_smirnov_test(data):
+    # Realizar la prueba KS para verificar normalidad
+    stat, p_value = kstest(data, 'norm')
+    
+    # Imprimir los resultados
+    print(f"Estadístico KS: {stat}")
+    print(f"P-valor: {p_value}")
+    
+    # Interpretar el resultado
+    alpha = 0.05
+    
+   
+    if p_value > alpha:
+        print("No se rechaza la hipótesis nula: los datos podrían seguir una distribución normal")
+    else:
+        print("Se rechaza la hipótesis nula: los datos no siguen una distribución normal")
 
     
     
@@ -614,4 +636,64 @@ def grafica_de_barras_compracion(df,paleta='viridis'):
     plt.show()
     
     
+#-------------- histograma------------------#
+
+def histograma(df,bi=50):
+    plt.hist(df, bins=bi, edgecolor='black')  # 'bins' es el número de barras en el histograma
+    plt.xlabel('Valores')
+    plt.ylabel('Frecuencia')
+    plt.title(f'Histograma ')
+
+    # Mostrar el histograma
+    plt.show()
+
+
+#------------- boxplot--------------#
+
+def boxplot(df,variable):
+    plt.figure(figsize=(6, 6))
+
+    # Crear el boxplot
+    sns.boxplot(y=df[df[variable]!=0][variable])
+
+    # Añadir título y etiqueta
+    plt.title("Distribución de dias_diferencia_entrega")
+    plt.ylabel("dias_diferencia_entrega")
+
+    # Mostrar el gráfico
+    plt.show()
+
+def boxplot_m(df, variables):
+    for variable in variables:
+        plt.figure(figsize=(6, 6))
+
+        # Crear el boxplot para cada variable
+        sns.boxplot(y=df[df[variable] != 0][variable])
+
+        # Añadir título y etiquetas
+        plt.title(f"Distribución de {variable}")
+        plt.ylabel(variable)
+
+        # Mostrar el gráfico
+        plt.show()
+
+
+#----------- QQ PLOT-------------------#
+
+def qq_plot(variable):
+    plt.figure(figsize=(8, 6))
+    stats.probplot(variable, dist="norm", plot=plt)
+    plt.title("QQ Plot para el Análisis de Normalidad")
+    plt.xlabel("Cuantiles Teóricos")
+    plt.ylabel("Cuantiles de los Datos")
+    plt.grid(True)
+    plt.show()
     
+    
+#-------- scater plot-------#
+
+def scater_plot(df,x,y):
+    sns.scatterplot(data=df, x=x, y=y)
+    plt.xlabel(f'{x}')
+    plt.ylabel(f'{y}')
+    plt.show()
